@@ -51,6 +51,9 @@ class TicTacToe:
     def get_legal_moves(self):
         return [i for i in range(9) if self.board[i] == 0]
 
+    def is_legal_move(self, move):
+        return move in self.get_legal_moves()
+
     def make_move(self, move):
         new_board = self.board[:]
         new_board[move] = self.player
@@ -120,8 +123,9 @@ def mcts(root, iterations=1000):
 
 
 def play_game():
-    game = TicTacToe()
+    game = TicTacToe(player=-1)
     while not game.is_terminal():
+        print_board(game.board)
         if game.player == 1:
             print("AI's Turn:")
             root = Node(game)
@@ -130,8 +134,12 @@ def play_game():
             print("Your Turn:")
             move = int(input())
 
+            while not game.is_legal_move(move):
+                print("Illegal Move! Try Again:")
+                print_board(game.board)
+                move = int(input("Your Turn : "))
+
         game = game.make_move(move)
-        print_board(game.board)
 
     winner = game.get_winner()
     if winner == 1:
@@ -146,9 +154,18 @@ def play_game():
 
 def print_board(board):
     symbols = {1: "X", -1: "O", 0: " "}
-    print("\n".join(["|".join([symbols[board[i]]
-          for i in range(j, j+3)]) for j in range(0, 9, 3)]))
-    print("-" * 5)
+
+    cur = 0
+    for i in range(3):
+        for j in range(3):
+          print(symbols[board[cur]], end="")
+          if j < 2:
+              print(" | ", end="")
+          else:
+              print()
+          cur += 1
+        if i < 2:
+            print("-" * 9)
 
 
 # Start the game
